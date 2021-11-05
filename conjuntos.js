@@ -19,15 +19,13 @@ function unique(l) {
 function iniciales(grammar, esTerminal, Xs) {
 	// ¿Hay más de un símbolo en Xs?
 	if(Xs.length > 1) {
-		const ret = [];
+		var ret = [];
 		// Por cada símbolo
 		for(let X of Xs) {
 			const Xini = iniciales(grammar, esTerminal, X);
+			ret = ret.concat(Xini);
 			// ¿Tiene ɛ?
-			if(Xini.indexOf('-') !== -1) {
-				// Sí lo tiene, hay que sacar los iniciales del símbolo siguiente
-				ret.push('-');
-			} else {
+			if(Xini.indexOf('-') === -1) {
 				// No hay ɛ, terminado.
 				break;
 			}
@@ -81,7 +79,8 @@ function seguidores(grammar, esTerminal, A) {
 			// ¿Hay algo después?
 			if(idx === grammar[i][1].length-1) {
 				// No
-				ret = ret.concat(seguidores(grammar, esTerminal, grammar[i][0]));
+				if(grammar[i][0] !== A)
+					ret = ret.concat(seguidores(grammar, esTerminal, grammar[i][0]));
 			} else {
 				// Sí
 				const beta = grammar[i][1][idx+1];
@@ -90,7 +89,8 @@ function seguidores(grammar, esTerminal, A) {
 				//    (Gracias al libro del dragón por este apunte que simplifica todo)
 				const ini = iniciales(grammar, esTerminal, beta);
 				if(iniciales(grammar, esTerminal, beta).indexOf('-') !== -1) {
-					ret = ret.concat(seguidores(grammar, esTerminal, grammar[i][0]));
+					if(grammar[i][0] !== A)
+						ret = ret.concat(seguidores(grammar, esTerminal, grammar[i][0]));
 				} else {
 					// No deriva estrella a ɛ
 					const aux = iniciales(grammar, esTerminal, beta);
