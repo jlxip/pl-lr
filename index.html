@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+
+<HTML>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<script src="conjuntos.js"></script>
+		<script src="slr.js"></script>
+		<script src="lr.js"></script>
+		<script src="lalr.js"></script>
+
+		<title>PL-LR</title>
+	</head>
+	<body>
+		<h1>PL-LR</h1>
+		<p>Generador paso a paso de tablas sintácticas SLR, LR(1), y LALR(1) para PL (UGR)</p>
+		<hr>
+
+		<b>Notas</b>
+		<ul>
+			<li>Símbolos de una sola letra, por favor 😔.</li>
+			<li>Se asume que el símbolo inicial es <samp>S</samp>.</li>
+			<li>Si no hay una producción de un símbolo <samp>X</samp> a otro, se entiende que es terminal. Da igual si está en mayúsculas o minúsculas.</li>
+			<li>Se usa <smap>-</smap> para ɛ.</li>
+			<li>No estudies con el código, la implementación del algoritmo es mucho más complicada que hacerlo a mano.</li>
+		</ul>
+
+		<br>
+		<p>Gramática:</p>
+		<textarea id="grammar" rows="10" cols="50">
+S: Aa | bAc | Bc | bBa
+A: d
+B: d</textarea><br>
+
+		<input type="radio" name="alg" id="SLR" checked>SLR</input>
+		<!--<input type="radio" name="alg" id="LR">LR(1)</input>
+		<input type="radio" name="alg" id="LALR">LALR(1)</input>-->
+
+		<hr>
+
+		<div id="res">
+		</div>
+
+		<script src="web.js"></script>
+		<script>parse();</script>
+
+		<hr>
+		<p><a href="https://github.com/jlxip/pl-lr">Código fuente.</a>
+		Hecho con ❤️ por <a href="https://jlxip.net">@jlxip</a>.</p>
+	</body>
+</HTML>
