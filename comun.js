@@ -1,4 +1,5 @@
 // Funciones comunes a todos los algoritmos
+"use strict";
 
 // Resulta que JS no permite comparar arrays
 const compArr = (a, b) => JSON.stringify([...a].sort()) == JSON.stringify([...b].sort());

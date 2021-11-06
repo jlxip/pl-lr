@@ -143,7 +143,10 @@ function LR_items(grammar, esTerminal, fClausura=LR_clausura, fGoto=LR_goto) {
 				if(rep < Iidx-1)
 					++offset;
 
-			ret.push([Iidx - offset, simbolo, repetido - offset, items]);
+			if(repetido !== -1)
+				repetido -= offset;
+
+			ret.push([Iidx - offset, simbolo, repetido, items]);
 		}
 	}
 
