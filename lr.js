@@ -8,17 +8,14 @@ function anticipacion(grammar, esTerminal, item) {
 	const beta = item[2].slice(1);
 	const a = item[3];
 	const ret = iniciales(grammar, esTerminal, beta+a);
+	// Se cambia '-' por $
+	for(let i in ret)
+		if(ret[i] === '-')
+			ret[i] = '$';
+
 	if(!ret.length)
 		return '$';
-	else if(ret.length === 1)
-		return ret[0];
-	else {
-		var txt = '<b>Más de un seguidor en los símbolos de anticipación de \'';
-		txt += item + '\'. Esto creo que no ha ocurrido en los ejercicios de clase.';
-		txt += ' No sé ni si es posible, y desde luego no sé qué hacer 🤡.</b>';
-		document.getElementById('res').innerHTML += txt;
-		return undefined;
-	}
+	return ret;
 }
 
 function LR_clausura(grammar, esTerminal, inicio) {
@@ -46,11 +43,13 @@ function LR_clausura(grammar, esTerminal, inicio) {
 			// Se añaden las producciones de ese símbolo con el punto a la izquierda del todo
 			for(let prod of grammar) {
 				if(prod[0] === trasPunto[0]) {
-					const ant = anticipacion(grammar, esTerminal, item);
-					if(prod[1] === '-')
-						abiertos.push([trasPunto[0], '-', '', ant]);
-					else
-						abiertos.push([trasPunto[0], '', prod[1], ant]);
+					const ants = anticipacion(grammar, esTerminal, item);
+					for(let ant of ants) {
+						if(prod[1] === '-')
+							abiertos.push([trasPunto[0], '-', '', ant]);
+						else
+							abiertos.push([trasPunto[0], '', prod[1], ant]);
+					}
 				}
 			}
 		}
@@ -141,10 +140,10 @@ function LR_items(grammar, esTerminal, fClausura=LR_clausura, fGoto=LR_goto) {
 			*/
 			var offset = 0;
 			for(let rep of repeticiones)
-				if(rep < Iidx)
+				if(rep < Iidx-1)
 					++offset;
 
-			ret.push([Iidx - offset, simbolo, repetido, items]);
+			ret.push([Iidx - offset, simbolo, repetido - offset, items]);
 		}
 	}
 
@@ -224,7 +223,7 @@ function LR_reducciones(grammar, esTerminal, items) {
 				text += '<li><samp>';
 				text += 'I' + i + ' &ni; ' + LR_item2str(its[j]) + '<br>';
 				text += 'Símbolo de anticipación = ' + ant;
-				text += '<br>Hay una reducción del estado I' + i;
+				text += '<br>Hay una reducción del estado ' + i;
 				text += ' con \'' + ant + '\' por la producción ';
 				const estaProd = [its[j][0], its[j][1]+its[j][2]];
 				for(let k in grammar) {

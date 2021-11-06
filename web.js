@@ -21,7 +21,7 @@ function parse() {
 	var paso1 = '<table border="1"><tr><td>Nº</td><td>Producción</td></tr>';
 	for(let i in nuevo) {
 		paso1 += '<tr><td>' + i + '</td><td><samp>';
-		paso1 += nuevo[i][0] + ': ' + nuevo[i][1];
+		paso1 += nuevo[i][0] + ': ' + nuevo[i][1].replaceAll('-', 'ɛ');
 		paso1 += '</samp></td></tr>';
 	}
 	paso1 += '</table>';
@@ -45,13 +45,17 @@ function parse() {
 
 	div.innerHTML += '<p>Se tiene:</p>';
 	var conjs = '<table border="1">';
-	conjs += '<tr><td>Símbolo</td><td>INICIALES</td><td>SEGUIDORES</td></tr>';
+	conjs += '<tr><td>Símbolo</td><td>INICIALES</td><td>SEGUIDORES</td><td>→*ɛ</td></tr>';
 	for(let simbolo in esTerminal) {
 		if(esTerminal[simbolo]) continue;
 		conjs += '<tr>';
 		conjs += '<td><samp>' + simbolo + '</samp></td>';
-		conjs += '<td><samp>' + iniciales(nuevo, esTerminal, simbolo).join(', ') + '</samp></td>';
+		conjs += '<td><samp>' + iniciales(nuevo, esTerminal, simbolo).join(', ').replaceAll('-', 'ɛ') + '</samp></td>';
 		conjs += '<td><samp>' + seguidores(nuevo, esTerminal, simbolo).join(', ') + '</samp></td>';
+		if(derivaEstrella(nuevo, esTerminal, simbolo))
+			conjs += '<td>SÍ</td>';
+		else
+			conjs += '<td>NO</td>';
 		conjs += '</tr>';
 	}
 	conjs += '</table>';

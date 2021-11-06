@@ -16,6 +16,62 @@ function unique(l) {
 	return ret;
 }
 
+function derivaEstrella(grammar, esTerminal, X) {
+	/*
+		Plan A (costoso)
+		Derivar X de todas las maneras posibles hasta encontrar ɛ.
+		Problema: pueden haber muchas derivaciones, como Y→Z→B→C→ɛ.
+		O peor, Y→Z→BC→RT→Qɛ→P→ɛ
+
+		Plan B (más simple)
+		Reducir ɛ a todos los no terminales que se pueda hasta encontrar Y.
+	*/
+
+	var red = grammar;
+	while(!derivaEpsilon(red, esTerminal, X)) {
+		// Dame un no terminal Y que derive a ɛ
+		var Y = '';
+		for(let prod of red) {
+			if(prod[1] === '-') {
+				Y = prod[0];
+				break;
+			}
+		}
+
+		// ¿Hay alguno?
+		if(Y === '') {
+			// No. Definitivamente X no deriva estrella a ɛ
+			return false;
+		}
+
+		// Nueva gramática sustituyendo Y por ɛ
+		const newred = [];
+		for(let prod of red) {
+			// Si la producción es desde Y, pasamos
+			if(prod[0] === Y)
+				continue;
+
+			var regla = prod[1].replaceAll(Y, '-');
+			// ɛɛ = ɛ
+			while(true) {
+				const aux = regla.replaceAll('--', '-');
+				if(aux === regla)
+					break;
+				regla = aux;
+			}
+			// αɛβ = αβ
+			if(regla.length !== 1)
+				regla = regla.replaceAll('-', '');
+			newred.push([prod[0], regla]);
+		}
+
+		red = newred;
+	}
+
+	// ¡Reducción de ɛ a Y!
+	return true;
+}
+
 function iniciales(grammar, esTerminal, Xs, visitados=[]) {
 	// ¿Hay más de un símbolo en Xs?
 	if(Xs.length > 1) {
@@ -35,9 +91,6 @@ function iniciales(grammar, esTerminal, Xs, visitados=[]) {
 	}
 	// Xs solo tiene un símbolo
 	const X = Xs[0];
-	if(visitados.indexOf(X) !== -1)
-		return [];
-	visitados.push(X);
 
 	// ¿Es X terminal?
 	if(esTerminal[X]) {
@@ -48,9 +101,14 @@ function iniciales(grammar, esTerminal, Xs, visitados=[]) {
 
 	var ret = [];
 
-	// ¿Deriva a ɛ?
-	if(derivaEpsilon(grammar, esTerminal, X))
+	// ¿Deriva estrella a ɛ?
+	if(derivaEstrella(grammar, esTerminal, X))
 		ret.push('-');
+
+	// ¿Ya visitado?
+	if(visitados.indexOf(X) !== -1)
+		return ret;
+	visitados.push(X);
 
 	// Por cada producción
 	for(let prod of grammar) {
@@ -83,20 +141,18 @@ function seguidores(grammar, esTerminal, A) {
 					ret = ret.concat(seguidores(grammar, esTerminal, grammar[i][0]));
 			} else {
 				// Sí
-				const beta = grammar[i][1][idx+1];
+				const beta = grammar[i][1].slice(idx+1);
+				const inibeta = iniciales(grammar, esTerminal, beta);
+				for(let x of inibeta)
+					if(x !== '-')
+						ret.push(x);
+
 				// ¿β deriva estrella a ɛ?
 				// Esto es lo mismo que preguntar si ɛ∊INICIALES(β)
 				//    (Gracias al libro del dragón por este apunte que simplifica todo)
-				const ini = iniciales(grammar, esTerminal, beta);
-				if(iniciales(grammar, esTerminal, beta).indexOf('-') !== -1) {
+				if(inibeta.indexOf('-') !== -1) {
 					if(grammar[i][0] !== A)
 						ret = ret.concat(seguidores(grammar, esTerminal, grammar[i][0]));
-				} else {
-					// No deriva estrella a ɛ
-					const aux = iniciales(grammar, esTerminal, beta);
-					for(let x of aux)
-						if(x !== '-')
-							ret.push(x);
 				}
 			}
 		}

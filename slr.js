@@ -90,7 +90,7 @@ function SLR_reducciones(grammar, esTerminal, items) {
 				text += 'I' + i + ' &ni; ' + SLR_item2str(its[j]) + '<br>';
 				text += 'SEG(' + its[j][0] + ') = {' + segs.join(', ') + '}';
 				for(let seg of segs) {
-					text += '<br>Hay una reducción del estado I' + i;
+					text += '<br>Hay una reducción del estado ' + i;
 					text += ' con \'' + seg + '\' por la producción ';
 					const estaProd = [its[j][0], its[j][1]+its[j][2]];
 					for(let k in grammar) {
