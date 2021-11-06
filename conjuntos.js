@@ -16,13 +16,13 @@ function unique(l) {
 	return ret;
 }
 
-function iniciales(grammar, esTerminal, Xs) {
+function iniciales(grammar, esTerminal, Xs, visitados=[]) {
 	// ¿Hay más de un símbolo en Xs?
 	if(Xs.length > 1) {
 		var ret = [];
 		// Por cada símbolo
 		for(let X of Xs) {
-			const Xini = iniciales(grammar, esTerminal, X);
+			const Xini = iniciales(grammar, esTerminal, X, visitados);
 			ret = ret.concat(Xini);
 			// ¿Tiene ɛ?
 			if(Xini.indexOf('-') === -1) {
@@ -35,6 +35,9 @@ function iniciales(grammar, esTerminal, Xs) {
 	}
 	// Xs solo tiene un símbolo
 	const X = Xs[0];
+	if(visitados.indexOf(X) !== -1)
+		return [];
+	visitados.push(X);
 
 	// ¿Es X terminal?
 	if(esTerminal[X]) {
@@ -54,11 +57,8 @@ function iniciales(grammar, esTerminal, Xs) {
 		// cuya parte izquierda sea X
 		if(prod[0] === X) {
 			// Se añaden los iniciales de la parte derecha
-			const ini = iniciales(grammar, esTerminal, prod[1]);
+			const ini = iniciales(grammar, esTerminal, prod[1], visitados);
 			ret = ret.concat(ini);
-
-			// Si ini no tiene ɛ, se han exaustado los iniciales.
-			if(ini.indexOf('-') === -1) break;
 		}
 	}
 

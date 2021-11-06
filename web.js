@@ -18,14 +18,14 @@ function parse() {
 
 	const div = document.getElementById('res');
 	div.innerHTML = '<h3>Paso 1: nuevo símbolo inicial y enumeración de las producciones</h3>';
-	var tabla = '<table border="1"><tr><td>Nº</td><td>Producción</td></tr>';
+	var paso1 = '<table border="1"><tr><td>Nº</td><td>Producción</td></tr>';
 	for(let i in nuevo) {
-		tabla += '<tr><td>' + i + '</td><td><samp>';
-		tabla += nuevo[i][0] + ': ' + nuevo[i][1];
-		tabla += '</samp></td></tr>';
+		paso1 += '<tr><td>' + i + '</td><td><samp>';
+		paso1 += nuevo[i][0] + ': ' + nuevo[i][1];
+		paso1 += '</samp></td></tr>';
 	}
-	tabla += '</table>';
-	div.innerHTML += tabla;
+	paso1 += '</table>';
+	div.innerHTML += paso1;
 
 	// Análisis de los símbolos: ¿Cuáles son terminales?
 	const esTerminal = {};
@@ -43,24 +43,47 @@ function parse() {
 		}
 	}
 
+	div.innerHTML += '<p>Se tiene:</p>';
+	var conjs = '<table border="1">';
+	conjs += '<tr><td>Símbolo</td><td>INICIALES</td><td>SEGUIDORES</td></tr>';
+	for(let simbolo in esTerminal) {
+		if(esTerminal[simbolo]) continue;
+		conjs += '<tr>';
+		conjs += '<td><samp>' + simbolo + '</samp></td>';
+		conjs += '<td><samp>' + iniciales(nuevo, esTerminal, simbolo).join(', ') + '</samp></td>';
+		conjs += '<td><samp>' + seguidores(nuevo, esTerminal, simbolo).join(', ') + '</samp></td>';
+		conjs += '</tr>';
+	}
+	conjs += '</table>';
+	div.innerHTML += conjs;
+
 	div.innerHTML += '<h3>Paso 2: colección canónica</h3>';
 	// Aquí empiezan los algoritmos
 	const slr = document.getElementById('SLR').checked;
-	const lr = false;//document.getElementById('LR').checked;
+	const lr = document.getElementById('LR').checked;
 	const lalr = false;//document.getElementById('LALR').checked;
+
+	// Se guardan los items repetidos con tal de poder deducir los estados.
 	if(slr) {
-		var items = SLR_items(nuevo, esTerminal);
-		items = SLR_mostrarItems(items); // Devuelve no repetidos
+		var itemsRepes = SLR_items(nuevo, esTerminal);
+		var items = SLR_mostrarItems(itemsRepes); // Agrega estados
 
 		div.innerHTML += '<h3>Paso 3: reducciones</h3>';
-		const reds = SLR_reducciones(nuevo, esTerminal, items);
-
-		div.innerHTML += '<h3>Paso 4: tabla sintáctica</h3>';
-		const tabla = SLR_tabla(nuevo, esTerminal, items, reds);
-		SLR_mostrarTabla(nuevo, esTerminal, items, tabla);
+		var reds = SLR_reducciones(nuevo, esTerminal, items);
+		var alg = 'SLR';
 	} else if(lr) {
+		var itemsRepes = LR_items(nuevo, esTerminal);
+		var items = LR_mostrarItems(itemsRepes); // Agrega estados
+
+		div.innerHTML += '<h3>Paso 3: reducciones</h3>';
+		var reds = LR_reducciones(nuevo, esTerminal, items);
+		var alg = 'LR(1)';
 	} else if(lalr) {
 	}
+
+	div.innerHTML += '<h3>Paso 4: tabla de análisis</h3>';
+	const tabla = calcularTabla(nuevo, esTerminal, itemsRepes, reds);
+	mostrarTabla(nuevo, esTerminal, items, tabla, alg);
 }
 
 

@@ -6,8 +6,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		<script src="conjuntos.js"></script>
-		<script src="slr.js"></script>
+		<script src="comun.js"></script>
 		<script src="lr.js"></script>
+		<script src="slr.js"></script>
 		<script src="lalr.js"></script>
 
 		<title>PL-LR</title>
@@ -32,9 +33,11 @@ S: Aa | bAc | Bc | bBa
 A: d
 B: d</textarea><br>
 
-		<input type="radio" name="alg" id="SLR" checked>SLR</input>
-		<!--<input type="radio" name="alg" id="LR">LR(1)</input>
-		<input type="radio" name="alg" id="LALR">LALR(1)</input>-->
+		<p>
+			Algoritmo:
+			<label><input type="radio" name="alg" id="SLR" onclick="parse()" checked>SLR</input></label>
+			<label><input type="radio" name="alg" id="LR" onclick="parse()">LR(1)</input></label>
+		</p>
 
 		<hr>
 
